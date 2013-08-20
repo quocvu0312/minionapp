@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Demo phát thử coi như nào</title>
+<script type="text/javascript" src="assets/easeljs-NEXT.min.js"></script>
+<script type="text/javascript" src="src/easeljs/events/EventDispatcher.js"></script>
+<script type="text/javascript" src="src/tweenjs/Tween.js"></script>
+<script type="text/javascript" src="src/tweenjs/Ease.js"></script>
+
+
+<script type="text/javascript" src="http://192.168.1.195:8000/socket.io/socket.io.js"></script>
+<script>
+
+	var socket= io.connect('http://192.168.1.195:8000');
+	function create_ball(_color,pointX,pointY)
+	{
+		socket.emit('create_ball',{color:_color,vtX:pointX,vtY:pointY});
+		
+	}
+	socket.on('create_ball',function(data){
+		
+		var ball= new createjs.Shape();
+		
+		ball.graphics.beginFill(data.mess.color).drawCircle(0,0,10);
+		
+		
+		
+		ball.x=data.mess.vtX;
+		ball.y=data.mess.vtY;
+		stage.addChild(ball);
+		
+	
+		
+		createjs.Tween.get(ball,{override:true}).wait(10).to({scaleX:2,scaleY:2},500,createjs.Ease.bounceOut).call(tweenComplete);
+		
+			
+	function tweenComplete()
+		{
+		createjs.Tween.get(ball,{override:true}).wait(100).to({y:480},1000,createjs.Ease.bounceOut).call(tweenComplete);
+		}	
+		
+		});
+	
+	
+	var stage;
+	var arrColor= new Array("#000000","#a200ff","#ff001e","#001eff","#24ff00","#6400c1","#2f1646","#297d7e","#063536");
+	function init()
+	{
+			stage= new createjs.Stage("canvas1");
+			stage.enableDOMEvents(true);
+			createjs.Touch.enable(stage);
+			
+			stage.addEventListener("stagemouseup",handleMouseUp);
+			
+		
+	
+	}
+	function handleMouseUp(event)
+	{
+		var ball= new createjs.Shape();
+		var color=arrColor[Math.round(Math.random()*9)];
+		console.log(color);
+		ball.graphics.beginFill(color).drawCircle(0,0,10);
+		
+		
+		
+		ball.x=stage.mouseX;
+		ball.y=stage.mouseY;
+		stage.addChild(ball);
+		
+		create_ball(color,stage.mouseX,stage.mouseY);
+		
+		createjs.Tween.get(ball,{override:true}).wait(10).to({scaleX:2,scaleY:2},500,createjs.Ease.bounceOut).call(tweenComplete);
+		
+		
+	function tweenComplete()
+		{
+		createjs.Tween.get(ball,{override:true}).wait(100).to({y:480},1000,createjs.Ease.bounceOut).call(tweenComplete);
+		}	
+		
+		createjs.Ticker.addEventListener("tick",stage);
+		  createjs.Touch.enable(stage);
+          createjs.Ticker.setFPS(60);
+	}
+	
+	
+
+</script>
+
+
+</head>
+
+<body onload="init();">
+	<canvas id="canvas1" width="800" height="480">
+    
+    </canvas>
+
+</body>
+</html>

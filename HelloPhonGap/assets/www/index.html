@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	
+		<!-- Metadata -->
+		<meta http-equiv="Content-type" name="viewport"
+			content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+	
+		<title>Hello world</title>
+	
+		<!-- Link to your style sheet (css files) -->
+		<link rel="stylesheet" href="styles/master.css" type="text/css"
+			charset="utf-8" />
+	
+		<!-- Load cordova's script -->
+		<script type="text/javascript" charset="utf-8"
+			src="scripts/cordova-2.7.0.js"></script>
+	
+		<!-- Load your script -->
+		<script type="text/javascript" charset="utf-8" src="scripts/main.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+</script>
+<script src="http://debug.phonegap.com/target/target-script-min.js#YOUR_GUID_HERE"></script>
+<script>
+$(document).ready(function(){
+  $("#btn").click(function(){
+		
+	 $.ajax({
+
+        type: 'POST',
+      	data: {msg:$('#nhap').val()},
+
+        url: 'http://dangxem.net/game/fa/api/',
+
+        success: function(data){
+
+            console.log(data);
+
+            alert(data);
+
+        },
+
+        error: function(){
+
+            console.log(data);
+
+            alert('There was an error adding your comment');
+
+        }
+
+    });
+
+  });
+});
+</script>
+	</head>
+
+	<body>
+		<input type="button" value="click" id="btn">
+		<input type="text" value="" id="nhap">
+	</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<script type="text/javascript" src="assets/easeljs-NEXT.min.js"></script>
+<script type="text/javascript" src="src/easeljs/events/EventDispatcher.js"></script>
+<script type="text/javascript" src="src/tweenjs/Tween.js"></script>
+<script type="text/javascript" src="src/tweenjs/Ease.js"></script>
+<script type="text/javascript" src="http://192.168.1.195:8000/socket.io/socket.io.js"></script>
+<script >
+	function init()
+	{
+		var socket= io.connect('http://192.168.1.195:8000');
+		
+		socket.emit('da_tao_bong',function(){});
+		
+		var stage= new createjs.Stage("canvas");
+		stage.enableDOMEvents(true);
+		createjs.Touch.enable(stage);
+		stage.addEventListener("stagemouseup",handleMouseUp);
+		var ball;
+		
+		function handleMouseUp(event)
+		{
+			ball= new createjs.Shape();
+			ball.graphics.beginFill("#FF0000").drawCircle(0,0,10);
+			ball.x=stage.mouseX;
+			ball.y=stage.mouseY;
+			sendVt(stage.mouseX,stage.mouseY);
+			createjs.Tween.get(ball).to({scaleX:3,scaleY:3},500,createjs.Ease.bounceOut);
+			
+			stage.removeEventListener("stagemouseup",handleMouseUp);
+			stage.addChild(ball);
+			
+			ball.onPress= function(event)
+			{
+				event.onMouseMove= function(evt){
+					
+					ball.x=stage.mouseX;
+					ball.y=stage.mouseY;
+					}	
+			}	
+		}
+		function sendVt(value1,value2)
+		{
+			socket.emit("create_ball",{vtx:value1,vty:value2});
+		}
+		
+		function move_ball(value1,value2)
+		{
+			socket.emit('move_ball',{vtx:value1,vty:value2});
+			console.log(ball.x,ball.y);
+		}
+	
+	
+		createjs.Ticker.addEventListener("tick",stage);
+		socket.on('huy_tao_bong',function(data){
+			
+			
+			ball= new createjs.Shape();
+			ball.graphics.beginFill("#FF0000").drawCircle(0,0,10);
+			ball.x=data.mess.vtx;
+			ball.y=data.mess.vty;
+			
+			console.log(data.vtx);
+			
+			createjs.Tween.get(ball).to({scaleX:3,scaleY:3},500,createjs.Ease.bounceOut);
+			
+			stage.removeEventListener("stagemouseup",handleMouseUp);
+			stage.addChild(ball);
+			
+			ball.onPress= function(event)
+			{
+				event.onMouseMove= function(evt){
+					
+					ball.x=stage.mouseX;
+					ball.y=stage.mouseY;
+					move_ball(ball.x,ball.y);
+					}	
+			}	
+			});
+		socket.on('move_ball_client',function(data)
+		{
+			ball.x=data.vtx;
+			ball.y=data.vty;
+		});
+		
+	} 
+</script>
+
+</head>
+<body onload="init();">
+    <canvas id="canvas" width="800" height="480">
+		    
+    
+    </canvas>
+
+</body>
+</html>
